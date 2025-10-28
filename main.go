@@ -49,7 +49,8 @@ func main() {
 		log.Printf("[%s] %s", &update.Message.From.UserName, update.Message.Text)
 
 		// Создаем ответное сообщение
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+		responseText := "👋 " + update.Message.Text
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, responseText)
 		msg.ReplyToMessageID = update.Message.MessageID
 
 		if _, err := bot.Send(msg); err != nil {
