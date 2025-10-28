@@ -1,0 +1,14 @@
+# Environment
+.env
+*.env
+
+# Binaries
+/bin/
+/my-echo-bot
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
