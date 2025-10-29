@@ -1,8 +1,9 @@
 package bot
 
 import (
-	"github.com/Tembo08/my-weather-bot/internal/location"
-	"github.com/Tembo08/my-weather-bot/internal/weather"
+	"my-weather-bot/internal/location"
+	"my-weather-bot/internal/weather"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
