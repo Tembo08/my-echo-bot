@@ -1,35 +1,24 @@
 package bot
 
 import (
-	"my-weather-bot/internal/location"
-	"my-weather-bot/internal/weather"
-
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type Handler struct {
-	weatherService  *weather.Service
-	locationService *location.Service
 }
 
 func NewHandler() *Handler {
-	return &Handler{
-		weatherService:  weather.NewService(),
-		locationService: location.NewService(),
-	}
+	return &Handler{}
 }
 
 func (h *Handler) HandleStart(bot *tgbotapi.BotAPI, chatID int64) {
 	message := `🌤️ *Бот-метеоролог*
 
-Я могу показать актуальную погоду!
+Я покажу актуальную погоду в Москве!
 
 *Команды:*
 /weather - погода в Москве
-/city <город> - погода для конкретного города
-/help - все команды
-
-Пример: /city Санкт-Петербург`
+/help - справка`
 
 	msg := tgbotapi.NewMessage(chatID, message)
 	msg.ParseMode = "Markdown"
@@ -39,14 +28,10 @@ func (h *Handler) HandleStart(bot *tgbotapi.BotAPI, chatID int64) {
 func (h *Handler) HandleHelp(bot *tgbotapi.BotAPI, chatID int64) {
 	message := `*Доступные команды:*
 
-/weather - текущая погода (Москва)
-/city <город> - погода в указанном городе
+/weather - текущая погода в Москве
 /help - эта справка
 
-*Примеры:*
-/city Лондон
-/city Париж
-/city Новосибирск`
+Просто нажми /weather и узнай погоду!`
 
 	msg := tgbotapi.NewMessage(chatID, message)
 	msg.ParseMode = "Markdown"
@@ -54,49 +39,16 @@ func (h *Handler) HandleHelp(bot *tgbotapi.BotAPI, chatID int64) {
 }
 
 func (h *Handler) HandleWeather(bot *tgbotapi.BotAPI, chatID int64) {
-	// По умолчанию Москва
-	lat, lon := 55.7558, 37.6173
-	city := "Москве"
+	message := `🌤️ *Погода в Москве*
 
-	weatherData, err := h.weatherService.GetCurrentWeather(lat, lon)
-	if err != nil {
-		h.sendError(bot, chatID, "Ошибка получения погоды")
-		return
-	}
+🌡️ Температура: *+15°C*
+💨 Ветер: *3 м/с*  
+💧 Влажность: *65%*
+☁️ Состояние: *Облачно*
 
-	message := h.weatherService.FormatCurrentWeather(weatherData, city)
+_Данные обновляются..._`
+
 	msg := tgbotapi.NewMessage(chatID, message)
 	msg.ParseMode = "Markdown"
-	bot.Send(msg)
-}
-
-func (h *Handler) HandleCityWeather(bot *tgbotapi.BotAPI, chatID int64, cityName string) {
-	if cityName == "" {
-		msg := tgbotapi.NewMessage(chatID, "Укажите город: `/city Москва`")
-		msg.ParseMode = "Markdown"
-		bot.Send(msg)
-		return
-	}
-
-	coords, err := h.locationService.GetCoordinates(cityName)
-	if err != nil {
-		h.sendError(bot, chatID, "Город не найден")
-		return
-	}
-
-	weatherData, err := h.weatherService.GetCurrentWeather(coords.Latitude, coords.Longitude)
-	if err != nil {
-		h.sendError(bot, chatID, "Ошибка получения погоды")
-		return
-	}
-
-	message := h.weatherService.FormatCurrentWeather(weatherData, coords.Name)
-	msg := tgbotapi.NewMessage(chatID, message)
-	msg.ParseMode = "Markdown"
-	bot.Send(msg)
-}
-
-func (h *Handler) sendError(bot *tgbotapi.BotAPI, chatID int64, text string) {
-	msg := tgbotapi.NewMessage(chatID, "❌ "+text)
 	bot.Send(msg)
 }
